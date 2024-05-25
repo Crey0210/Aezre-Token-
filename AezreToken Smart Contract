@@ -1,0 +1,42 @@
+// contracts/AezreToken.sol
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+// Import the ERC20 contract from OpenZeppelin
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol";
+
+// Define the contract, inheriting from ERC20
+contract AezreToken is ERC20 {
+    // Declare a private state variable to store the contract owner's address
+    address private _owner;
+
+    // Constructor function that runs once when the contract is deployed
+    constructor(uint256 initialSupply) ERC20("AezreToken", "AZR") {
+        // Set the owner as the address that deployed the contract
+        _owner = msg.sender;
+        // Mint an initial supply of tokens to the owner (optional)
+        _mint(msg.sender, initialSupply); // initial supply can be like this 1000000 * 10 ** uint(decimals())
+    }
+
+    // Modifier to restrict certain functions to only the owner
+    modifier onlyOwner() {
+        require(msg.sender == _owner, "Only owner can call this function");
+        _;
+    }
+
+    // Function to mint new tokens, only callable by the owner
+    function mint(address account, uint256 amount) public onlyOwner {
+        _mint(account, amount);
+    }
+
+    // Override the transfer function from ERC20 to make it public
+    function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
+        _transfer(_msgSender(), recipient, amount);
+        return true;
+    }
+
+    // Function to burn tokens from the caller's account
+    function burn(uint256 amount) public virtual {
+        _burn(_msgSender(), amount);
+    }
+}
